@@ -14,7 +14,6 @@ let usersRef = db.collection("Users");
 let emerRef = admin.firestore().collection("Emergencies");
 let linkRef = db.collection("Links");
 let ambuRef = db.collection("Ambulance");
-let questionRef = db.collection("Questions");
 let answerRef = db.collection("Answers");
 const bodyParser = require('body-parser');
 
@@ -32,10 +31,10 @@ app.get('/login/:id', async(req,res) => {
         const link = linkRef.doc(req.params.id);
         await link.update({
             isSent: true
-        })
+        });
         await user.update({
             checkpoint:"Entered"
-        })
+        });
         res.status(200).send("User entered the link. Please use the link below to set user privacy.\n http://localhost:5001/restapi-58654/us-central1/user/consent-agreement/"+req.params.id+' Using PUT method.');
     }
     catch(err){
@@ -138,7 +137,7 @@ app.post('/check-point', async (req,res) => {
         let user = usersRef.doc(userid);
         await user.update({
             checkpoint:val
-        })
+        });
         const answer = req.body.answers;
         const answerdata ={
             answer,
@@ -152,7 +151,7 @@ app.post('/check-point', async (req,res) => {
         let ambulance = ambuRef.doc(userid);
         await ambulance.update({
             status:"Submitted"
-        })
+        });
 
         res.status(200).send({IfDone:"http://localhost:5001/restapi-58654/us-central1/user/request-ambulance/"+userid+" PUT method to request ambulance" ,value : val, id: userid, Answer: answerdata});
     }catch (err) {
@@ -166,7 +165,7 @@ app.put('/consent-agreement/:id', async (req,res) => {
         const user = usersRef.doc(uid);
         await user.update({
             consentPrivacy: true
-        })
+        });
         res.status(200).send('Use the links below to get previews question. \n http://localhost:5001/restapi-58654/us-central1/user/login-terms-agreements/'+uid+'\n Paste link in GET method and run.');
     }
     catch(err){
@@ -181,11 +180,11 @@ app.put('/complete-tracking/:id', async (req,res) => {
         await ambulance.update({
             status:"Arrived",
             checkpoint:"Confirmation"
-        })
+        });
         const user = usersRef.doc(req.params.id);
         await user.update({
             checkpoint:"Confirmation"
-        })
+        });
         res.status(200).send("You're done. \n Use http://localhost:5001/restapi-58654/us-central1/user/"+req.params.id+" DELETE method to delete user.");
     }
     catch(err){
@@ -231,35 +230,35 @@ app.delete('/:id', async (req,res) => {
                         result.error = Error(97, 'Connection failed')
                         res.send(result)
                         return
-                    })
+                    });
                     return
 
                 }).catch(error => {
                     result.error = Error(97, 'Connection failed')
                     res.send(result)
                     return
-                })
+                });
                 return
 
             }).catch(error => {
                 result.error = Error(97, 'Connection failed')
                 res.send(result)
                 return
-            })
+            });
             return
 
         }).catch(error => {
             result.error = Error(97, 'Connection failed')
             res.send(result)
             return
-        })
+        });
         return
     }).catch(error => {
         result.error = Error(97, 'Connection failed')
         res.send(result)
         return
-    })
-})
+    });
+});
 
 exports.user = functions.https.onRequest(app);
 
