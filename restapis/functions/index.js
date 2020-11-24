@@ -1,4 +1,4 @@
-
+'use strict';
 
 /* eslint-disable promise/no-nesting */
 const admin = require('firebase-admin');
@@ -7,7 +7,7 @@ const functions = require('firebase-functions');
 admin.initializeApp();
 const express = require('express');
 const app = express();
-const cors = require('cors');
+
 
 let db = admin.firestore();
 let usersRef = db.collection("Users");
