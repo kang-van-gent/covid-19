@@ -15,6 +15,7 @@ let emerRef = admin.firestore().collection("Emergencies");
 let linkRef = db.collection("Links");
 let ambuRef = db.collection("Ambulance");
 let answerRef = db.collection("Answers");
+let smsRef = db.collection("SMS");
 const bodyParser = require('body-parser');
 
 app.use(bodyParser.json());
@@ -261,6 +262,7 @@ app.delete('/:id', async (req,res) => {
 });
 
 exports.user = functions.https.onRequest(app);
+exports.admin = functions.https.onRequest(api);
 
 var Result = function(){
     return {
@@ -276,3 +278,130 @@ var Error = function(code, msg){
         msg: msg
     }
 }
+
+api.delete('delete-user/:id', async (req,res) => {
+    const uid = req.params.id;
+    let result = Result();
+
+    usersRef.doc(uid).delete().then(user => {
+        linkRef.doc(uid).delete().then(link => {
+            emerRef.doc(uid).delete().then(emer => {
+                ambuRef.doc(uid).delete().then(ambu => {
+                    answerRef.doc(uid).delete().then(answer => {
+                        result.success = true
+                        result.response ='Deleted successfully'
+                        res.send(result)
+                        return
+                    }).catch(error => {
+                        result.error = Error(97, 'Connection failed')
+                        res.send(result)
+                        return
+                    });
+                    return
+
+                }).catch(error => {
+                    result.error = Error(97, 'Connection failed')
+                    res.send(result)
+                    return
+                });
+                return
+
+            }).catch(error => {
+                result.error = Error(97, 'Connection failed')
+                res.send(result)
+                return
+            });
+            return
+
+        }).catch(error => {
+            result.error = Error(97, 'Connection failed')
+            res.send(result)
+            return
+        });
+        return
+    }).catch(error => {
+        result.error = Error(97, 'Connection failed')
+        res.send(result)
+        return
+    });
+});
+
+api.post('/gen-user',async (req,res) => {
+    try{
+        
+        const uid = genId();
+        const user = {
+            phone: req.body.user,
+            consentPrivacy: false,
+            date: new Date(),
+            checkpoint:""
+        }
+        const emergency = {
+            userId: uid,
+            loc:"location",
+            date: new Date()
+        }
+        const link = {
+            userId: uid,
+            date: new Date(),
+            isSent: false,
+            expiration: null
+        }
+        const ambulance ={
+            userId: uid,
+            emergenciesId: uid,
+            arrivedTime : null,
+            checkpoint: null,
+            criticalLevel: null,
+            isCovid: null,
+            rejectedTime: null,
+            status: "Submitted",
+            submitTime: new Date(),
+            sentTime: null
+        }
+
+        await usersRef.doc(uid).set(user);
+        await emerRef.doc(uid).set(emergency);
+        await linkRef.doc(uid).set(link);
+        await ambuRef.doc(uid).set(ambulance);
+
+        res.send('Create user successful');
+
+    } catch (err){
+        res.send(err.message);
+    }
+
+})
+
+api.put('/send-ambulance/:id'), async (req,res) => {
+    let id = req.params.id
+    let ambulance = ambuRef.doc(id)
+    await ambulance.update ({
+        status:"Sent"
+    })
+
+    res.status(200).send('Sent ambulance successful')
+
+}
+
+api.post('/send-sms/:id', async (req,res) => {
+    /*{
+            "telNo" : "123146547",
+            "sms" : "Messages"
+        }*/
+        try{
+            const telNo = req.body.telNo;
+            const massage = req.body.sms;
+            const userid = req.params.id;
+            let sms = smsRef.doc(userid);
+            await sms.set({
+                telephone: telNo,
+                Massage:massage
+            });
+    
+            res.status(200).send('SMS sent successful');
+        }catch (err) {
+            res.status(500).send(err.massage);
+        }
+
+})
