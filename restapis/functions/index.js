@@ -35,7 +35,7 @@ app.get('/login/:id', async(req,res) => {
         await user.update({
             checkpoint:"Entered"
         });
-        res.status(200).send("User entered the link. Please use the link below to set user privacy.\n http://localhost:5001/restapi-58654/us-central1/user/consent-agreement/"+req.params.id+' Using PUT method.');
+        res.status(200).send("User entered the link. Please use the link below to set user privacy.\n https://us-central1-covid19-test-a70c0.cloudfunctions.net/user/consent-agreement/"+req.params.id+' Using PUT method.');
     }
     catch(err){
         res.status(500).send(err);
@@ -57,7 +57,7 @@ app.get('/login-terms-agreements/:id', async(req,res) => {
         let amdres = ambdata.data();
         
         res.send({
-            Message:'Get data sucessful, Past link in POST method to answer the questions : http://localhost:5001/restapi-58654/us-central1/user/check-point?val=red&?uid='+id,
+            Message:'Get data sucessful, Past link in POST method to answer the questions : https://us-central1-covid19-test-a70c0.cloudfunctions.net/user/check-point?val=red&?uid='+id,
             Emergencies: emerres,
             Ambulance: amdres,
             Question:"First Question"
@@ -111,7 +111,7 @@ app.post('/add',async (req,res) => {
         await linkRef.doc(uid).set(link);
         await ambuRef.doc(uid).set(ambulance);
 
-        res.send('Create user successful, Please copy the links below. \n http://localhost:5001/restapi-58654/us-central1/user/login/'+uid+'\n Paste link in GET method and run.');
+        res.send('Create user successful, Please copy the links below. \n https://us-central1-covid19-test-a70c0.cloudfunctions.net/user/login/'+uid+'\n Paste link in GET method and run.');
 
     } catch (err){
         res.send(err.message);
@@ -153,7 +153,7 @@ app.post('/check-point', async (req,res) => {
             status:"Submitted"
         });
 
-        res.status(200).send({IfDone:"http://localhost:5001/restapi-58654/us-central1/user/request-ambulance/"+userid+" PUT method to request ambulance" ,value : val, id: userid, Answer: answerdata});
+        res.status(200).send({IfDone:"https://us-central1-covid19-test-a70c0.cloudfunctions.net/user/request-ambulance/"+userid+" PUT method to request ambulance" ,value : val, id: userid, Answer: answerdata});
     }catch (err) {
         res.status(500).send(err.massage);
     }
@@ -166,7 +166,7 @@ app.put('/consent-agreement/:id', async (req,res) => {
         await user.update({
             consentPrivacy: true
         });
-        res.status(200).send('Use the links below to get previews question. \n http://localhost:5001/restapi-58654/us-central1/user/login-terms-agreements/'+uid+'\n Paste link in GET method and run.');
+        res.status(200).send('Use the links below to get previews question. \n https://us-central1-covid19-test-a70c0.cloudfunctions.net/user/login-terms-agreements/'+uid+'\n Paste link in GET method and run.');
     }
     catch(err){
         res.status(500).send(err.message);
@@ -185,7 +185,7 @@ app.put('/complete-tracking/:id', async (req,res) => {
         await user.update({
             checkpoint:"Confirmation"
         });
-        res.status(200).send("You're done. \n Use http://localhost:5001/restapi-58654/us-central1/user/"+req.params.id+" DELETE method to delete user.");
+        res.status(200).send("You're done. \n Use https://us-central1-covid19-test-a70c0.cloudfunctions.net/user"+req.params.id+" DELETE method to delete user.");
     }
     catch(err){
         res.status(500).send(err);
@@ -203,7 +203,7 @@ app.put('/request-ambulance/:id', async (req,res) => {
             EmergencyDetail:emergency
         })
 
-        res.status(200).send({Message:"You're requesting for the ambulance, Use http://localhost:5001/restapi-58654/us-central1/user/complete-tracking/"+id+" PUT method to complete tracking the ambulance.",Status:(await ambulance.get()).data()})
+        res.status(200).send({Message:"You're requesting for the ambulance, Use https://us-central1-covid19-test-a70c0.cloudfunctions.net/user/complete-tracking/"+id+" PUT method to complete tracking the ambulance.",Status:(await ambulance.get()).data()})
 
     }
     catch(err){
